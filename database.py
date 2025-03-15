@@ -1,4 +1,5 @@
 import sqlite3
+import logging
 from typing import Set, Optional
 from config import OWNER_ID
 
@@ -52,10 +53,16 @@ class Database:
     def is_user_approved(self, user_id: int) -> bool:
         if user_id == OWNER_ID:
             return True
-        cursor = self.conn.cursor()
-        cursor.execute('SELECT 1 FROM approved_users WHERE user_id = ?', (user_id,))
-        return cursor.fetchone() is not None
-        
+        try:
+            cursor = self.conn.cursor()
+            cursor.execute('SELECT 1 FROM approved_users WHERE user_id = ?', (user_id,))
+            result = cursor.fetchone() is not None
+            cursor.close()
+            return result
+        except Exception as e:
+            logging.error(f"Error checking user approval status: {e}")
+            return False
+
     def add_sudo_user(self, user_id: int, username: str, added_by: int) -> bool:
         try:
             cursor = self.conn.cursor()
@@ -82,7 +89,12 @@ class Database:
     def is_sudo_user(self, user_id: int) -> bool:
         if user_id == OWNER_ID:
             return True
-        cursor = self.conn.cursor()
-        cursor.execute('SELECT 1 FROM sudo_users WHERE user_id = ?', (user_id,))
-        return cursor.fetchone() is not None
-
+        try:
+            cursor = self.conn.cursor()
+            cursor.execute('SELECT 1 FROM sudo_users WHERE user_id = ?', (user_id,))
+            result = cursor.fetchone() is not None
+            cursor.close()
+            return result
+        except Exception as e:
+            logging.error(f"Error checking sudo user status: {e}")
+            return False

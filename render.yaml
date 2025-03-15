@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: telegram-moderation-bot
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python bot.py
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
+      - key: OWNER_ID
+        sync: false
+      - key: OWNER_NAME
+        sync: false
+      - key: OWNER_USERNAME
+        sync: false
+    plan: free

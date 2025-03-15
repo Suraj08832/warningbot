@@ -218,7 +218,11 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         # Check for media content
         if is_media_message(update.message):
-            if not db.is_user_approved(user_id):
+            is_approved = db.is_user_approved(user_id)
+            is_sudo = db.is_sudo_user(user_id)
+            logger.debug(f"Media message from user {user_id}: Approved={is_approved}, Sudo={is_sudo}")
+
+            if not (is_approved or is_sudo):
                 try:
                     await update.message.delete()
                     message = await send_temp_message(update.effective_chat.id, "❌ You need to be approved to send media content.", context)
