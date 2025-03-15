@@ -27,7 +27,11 @@ def is_media_message(message) -> bool:
 
 def is_edited_message(message) -> bool:
     """Check if message is edited"""
-    return message.edit_date is not None
+    try:
+        # Check both edit_date and edit history for robustness
+        return bool(message.edit_date) or bool(getattr(message, 'edited', False))
+    except Exception:
+        return False
 
 def check_copyright_violation(text: str) -> bool:
     """Basic copyright violation check"""
