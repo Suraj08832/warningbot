@@ -51,7 +51,25 @@ def main():
 
     # Start the bot
     logger.info("Starting bot...")
-    updater.start_polling()
+    
+    # Get port from environment variable or use default
+    PORT = int(os.environ.get('PORT', '8443'))
+    
+    if os.environ.get('RENDER'):
+        # Running on Render, use webhooks
+        RENDER_EXTERNAL_URL = os.environ.get('RENDER_EXTERNAL_URL')
+        updater.start_webhook(
+            listen="0.0.0.0",
+            port=PORT,
+            url_path=BOT_TOKEN,
+            webhook_url=f"{RENDER_EXTERNAL_URL}/{BOT_TOKEN}"
+        )
+        logger.info(f"Bot started on Render with webhook on port {PORT}")
+    else:
+        # Local development, use polling
+        updater.start_polling()
+        logger.info("Bot started locally with polling")
+    
     updater.idle()
 
 if __name__ == '__main__':
