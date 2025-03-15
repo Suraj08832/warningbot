@@ -1,18 +1,20 @@
-from typing import Union, Tuple
 import re
+import asyncio
+from typing import Union, Tuple
+from telegram import Message
 
 def extract_user_info(text: str) -> Tuple[Union[int, None], Union[str, None]]:
     """Extract user ID and username from command text"""
     user_id = None
     username = None
-    
+
     # Try to extract user ID
     if text.isdigit():
         user_id = int(text)
     # Try to extract username
     elif text.startswith('@'):
         username = text
-    
+
     return user_id, username
 
 def is_media_message(message) -> bool:
@@ -41,9 +43,17 @@ def check_copyright_violation(text: str) -> bool:
         r'copyright\s*\d{4}',
         r'proprietary\s*content',
     ]
-    
+
     text = text.lower()
     for pattern in copyright_patterns:
         if re.search(pattern, text, re.IGNORECASE):
             return True
     return False
+
+async def delete_message_after_delay(message: Message, delay: int = 30):
+    """Delete a message after specified delay in seconds"""
+    try:
+        await asyncio.sleep(delay)
+        await message.delete()
+    except Exception:
+        pass  # Silently handle deletion errors
