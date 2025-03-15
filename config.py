@@ -1,7 +1,7 @@
 import os
 
 # Bot configuration
-BOT_TOKEN = os.environ.get("BOT_TOKEN", "7617534486:AAFUkmCp_h429Vpv1ytU3Sn5YINdDYvOCfA")  # Default for development
+BOT_TOKEN = os.environ.get("BOT_TOKEN", "7617534486:AAEsA9dbH45Ysqn0BXpLyu6qgV99lpiJ9_g")  # Default for development
 OWNER_ID = int(os.environ.get("OWNER_ID", "7845308909"))  # Default for development
 OWNER_NAME = os.environ.get("OWNER_NAME", "𐏓  мым‌꯭𝆬ᷟj‌➥‌𝗭𝗲‌𝗳𝗿𝗼‌𝗻 ‌🔥❰⎯꯭ ꭗ‌‌")  # Default for development
 OWNER_USERNAME = os.environ.get("OWNER_USERNAME", "@Crush_hu_tera")  # Default for development

@@ -1,16 +1,18 @@
 services:
   - type: web
-    name: telegram-moderation-bot
+    name: copyright-shield-bot
     env: python
     buildCommand: pip install -r requirements.txt
     startCommand: python bot.py
     envVars:
       - key: BOT_TOKEN
-        sync: false
+        value: "7617534486:AAEsA9dbH45Ysqn0BXpLyu6qgV99lpiJ9_g"
       - key: OWNER_ID
-        sync: false
+        value: "7845308909"
       - key: OWNER_NAME
-        sync: false
+        value: "𐏓  мым‌꯭𝆬ᷟj‌➥‌𝗭𝗲‌𝗳𝗿𝗼‌𝗻 ‌🔥❰⎯꯭ ꭗ‌‌"
       - key: OWNER_USERNAME
-        sync: false
+        value: "@Crush_hu_tera"
+      - key: SERVER_NAME
+        value: "copyright-shield-bot.onrender.com"
     plan: free
