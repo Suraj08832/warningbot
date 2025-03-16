@@ -281,3 +281,21 @@ def handle_message(update: Update, context: CallbackContext):
 
     except Exception as e:
         logger.error(f"Error in message handler: {e}")
+
+def ping_command(update: Update, context: CallbackContext):
+    """Handle the /ping command"""
+    try:
+        start_time = time.time()
+        message = context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text="🏓 Pinging..."
+        )
+        end_time = time.time()
+        response_time = round((end_time - start_time) * 1000, 2)  # Convert to milliseconds
+        message.edit_text(f"🏓 Pong!\nResponse Time: {response_time}ms")
+    except Exception as e:
+        logger.error(f"Error in /ping command: {e}")
+        context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text="❌ Error while checking bot status."
+        )

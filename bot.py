@@ -6,6 +6,7 @@ from config import BOT_TOKEN
 from handlers import (
     start_command,
     help_command,
+    ping_command,
     approve_command,
     disapprove_command,
     addsudo_command,
@@ -31,6 +32,7 @@ def main():
     # Add command handlers
     dispatcher.add_handler(CommandHandler("start", start_command))
     dispatcher.add_handler(CommandHandler("help", help_command))
+    dispatcher.add_handler(CommandHandler("ping", ping_command))
     dispatcher.add_handler(CommandHandler("approve", approve_command))
     dispatcher.add_handler(CommandHandler("disapprove", disapprove_command))
     dispatcher.add_handler(CommandHandler("addsudo", addsudo_command))

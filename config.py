@@ -34,6 +34,9 @@ START_MESSAGE = """
 • Spam Control
 • User Management
 
+👑 Owner: 𐏓  𝅥‌꯭𝆬ᷟj‌➥‌𝗭𝗲‌𝗳𝗿𝗼‌𝗻 ‌🔥❰⎯꯭ ꭗ‌‌
+📢 Channel: @Crushhutera
+
 Use /help to see all available commands.
 """
 
@@ -52,6 +55,7 @@ DATABASE_URL = os.environ.get('DATABASE_URL', 'sqlite:///bot.db')
 BOT_COMMANDS = [
     ("start", "Start the bot"),
     ("help", "Show help message"),
+    ("ping", "Check if bot is alive"),
     ("approve", "Approve a user (Admin/Sudo only)"),
     ("disapprove", "Disapprove a user (Admin/Sudo only)"),
     ("addsudo", "Add sudo user (Owner only)"),
