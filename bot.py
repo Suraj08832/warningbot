@@ -12,10 +12,11 @@ from handlers import (
     removesudo_command,
     status_command,
     handle_message,
-    handle_edited_message
+    handle_edited_message,
+    main
 )
 
-# Enable logging
+# Configure logging
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO

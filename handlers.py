@@ -1,9 +1,17 @@
 import logging
-from telegram import Update, BotCommand
+import time
+from telegram import Update, ParseMode, BotCommand
 from telegram.ext import CallbackContext
+from telegram.error import BadRequest
 from config import (
     OWNER_ID, OWNER_NAME, OWNER_USERNAME,
-    WELCOME_MESSAGE, HELP_MESSAGE, BOT_COMMANDS
+    WELCOME_MESSAGE, HELP_MESSAGE, BOT_COMMANDS,
+    BOT_NAME,
+    START_MESSAGE,
+    WARNING_MESSAGE,
+    ADMIN_ID,
+    APPROVED_USERS,
+    SUDO_USERS
 )
 from database import Database
 from utils import (
@@ -43,10 +51,7 @@ def start_command(update: Update, context: CallbackContext):
             BotCommand(command, description) for command, description in BOT_COMMANDS
         ])
         # Send welcome message with owner info
-        send_temp_message(update, context, WELCOME_MESSAGE.format(
-            owner_name=OWNER_NAME,
-            owner_username=OWNER_USERNAME
-        ))
+        send_temp_message(update, context, START_MESSAGE.format(bot_name=BOT_NAME))
     except Exception as e:
         logger.error(f"Error in /start command: {e}")
 
@@ -112,8 +117,8 @@ def disapprove_command(update: Update, context: CallbackContext):
 def addsudo_command(update: Update, context: CallbackContext):
     """Handle the /addsudo command"""
     try:
-        if not update.message or update.effective_user.id != OWNER_ID:
-            send_temp_message(update, context, "❌ Only the owner can add sudo users.")
+        if not update.message or update.effective_user.id != ADMIN_ID:
+            send_temp_message(update, context, "❌ Only the bot admin can add sudo users.")
             return
 
         user_id, username = get_user_from_message(update, context)
@@ -126,13 +131,13 @@ def addsudo_command(update: Update, context: CallbackContext):
         if user_id:
             if db.add_sudo_user(user_id, username or str(user_id), update.effective_user.id):
                 send_temp_message(update, context, f"✅ User {user_id} has been added as sudo.")
-                logger.info(f"User {user_id} added as sudo by owner")
+                logger.info(f"User {user_id} added as sudo by admin")
             else:
                 send_temp_message(update, context, "❌ Failed to add sudo user.")
         elif username:
             if db.add_sudo_user(0, username, update.effective_user.id):  # Using 0 as temporary ID
                 send_temp_message(update, context, f"✅ User {username} has been added as sudo.")
-                logger.info(f"User {username} added as sudo by owner")
+                logger.info(f"User {username} added as sudo by admin")
             else:
                 send_temp_message(update, context, "❌ Failed to add sudo user.")
     except Exception as e:
@@ -141,8 +146,8 @@ def addsudo_command(update: Update, context: CallbackContext):
 def removesudo_command(update: Update, context: CallbackContext):
     """Handle the /removesudo command"""
     try:
-        if not update.message or update.effective_user.id != OWNER_ID:
-            send_temp_message(update, context, "❌ Only the owner can remove sudo users.")
+        if not update.message or update.effective_user.id != ADMIN_ID:
+            send_temp_message(update, context, "❌ Only the bot admin can remove sudo users.")
             return
 
         user_id, username = get_user_from_message(update, context)
@@ -155,7 +160,7 @@ def removesudo_command(update: Update, context: CallbackContext):
         if user_id:
             if db.remove_sudo_user(user_id):
                 send_temp_message(update, context, f"✅ User {user_id} has been removed from sudo.")
-                logger.info(f"User {user_id} removed from sudo by owner")
+                logger.info(f"User {user_id} removed from sudo by admin")
             else:
                 send_temp_message(update, context, "❌ Failed to remove sudo user.")
     except Exception as e:
@@ -172,16 +177,16 @@ def status_command(update: Update, context: CallbackContext):
         is_sudo = db.is_sudo_user(user_id)
 
         status = []
-        if user_id == OWNER_ID:
-            status.append("👑 You are the bot owner")
+        if user_id == ADMIN_ID:
+            status.append("👑 You are the bot admin")
         if is_sudo:
             status.append("⭐ You are a sudo user")
         if is_approved:
             status.append("✅ You are an approved user")
-        if not any([user_id == OWNER_ID, is_sudo, is_approved]):
+        if not any([user_id == ADMIN_ID, is_sudo, is_approved]):
             status.append("❌ You are not approved")
 
-        logger.debug(f"Status check for user {user_id}: Owner={user_id == OWNER_ID}, Sudo={is_sudo}, Approved={is_approved}")
+        logger.debug(f"Status check for user {user_id}: Admin={user_id == ADMIN_ID}, Sudo={is_sudo}, Approved={is_approved}")
         send_temp_message(update, context, "\n".join(status))
     except Exception as e:
         logger.error(f"Error in /status command: {e}")
@@ -198,10 +203,23 @@ def handle_edited_message(update: Update, context: CallbackContext):
             # Delete the edited message
             update.edited_message.delete()
             # Send warning about edited messages with auto-delete
-            send_temp_message(update, context, "❌ Edited messages are not allowed.")
-            logger.info(f"Deleted edited message {update.edited_message.message_id} from user {update.effective_user.id}")
+            warning = WARNING_MESSAGE.format(
+                user_name=update.edited_message.from_user.first_name
+            )
+            warning_msg = context.bot.send_message(
+                chat_id=update.edited_message.chat_id,
+                text=warning,
+                parse_mode=ParseMode.HTML
+            )
+            
+            # Delete warning message after 30 seconds
+            context.job_queue.run_once(
+                lambda _: warning_msg.delete(),
+                30,
+                context=warning_msg.chat_id
+            )
         except Exception as e:
-            logger.error(f"Error deleting edited message: {e}")
+            logger.error(f"Error handling edited message: {e}")
 
     except Exception as e:
         logger.error(f"Error in edited message handler: {e}")

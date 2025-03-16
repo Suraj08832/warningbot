@@ -1,12 +1,64 @@
 import os
 
-# Bot configuration
-BOT_TOKEN = os.environ.get("BOT_TOKEN", "7617534486:AAEsA9dbH45Ysqn0BXpLyu6qgV99lpiJ9_g")  # Default for development
-OWNER_ID = int(os.environ.get("OWNER_ID", "7845308909"))  # Default for development
-OWNER_NAME = os.environ.get("OWNER_NAME", "𐏓  мым‌꯭𝆬ᷟj‌➥‌𝗭𝗲‌𝗳𝗿𝗼‌𝗻 ‌🔥❰⎯꯭ ꭗ‌‌")  # Default for development
-OWNER_USERNAME = os.environ.get("OWNER_USERNAME", "@Crush_hu_tera")  # Default for development
+# Bot token from environment variable
+BOT_TOKEN = os.environ.get('BOT_TOKEN')
 
-# Bot Commands configuration
+# Admin ID from environment variable (as integer)
+ADMIN_ID = int(os.environ.get('ADMIN_ID', 0))
+
+# Bot information
+BOT_USERNAME = "Xsecurity_shielders_bot"
+BOT_NAME = "🛡️ SECURITY SHIELD"
+BOT_DESCRIPTION = """
+🛡️ ULTIMATE SECURITY SHIELD ACTIVATED 🛡️
+Protecting your conversations with military-grade encryption & AI-powered threat detection! Our advanced Security Bot safeguards against unauthorized media, edited messages, malicious links & spam content. 24/7 protection for a safe & secure chat experience! 💬
+
+Features:
+✅ Military-grade security protection
+🛡️ AI-powered threat detection
+🔒 Automatic message encryption
+⚠️ Real-time spam prevention
+⚡ 24/7 Active monitoring
+🤖 Advanced security algorithms
+"""
+
+# Message templates
+START_MESSAGE = """
+👋 Hello! I'm {bot_name}.
+
+I'm your ultimate security shield, protecting your group with advanced security features.
+Use /help to see available commands.
+"""
+
+HELP_MESSAGE = """
+Available commands:
+
+👥 User Commands:
+/start - Start the bot
+/help - Show this help message
+/status - Check bot status
+
+👑 Admin Commands:
+/approve - Approve a user
+/disapprove - Remove user approval
+/addsudo - Add a sudo user
+/removesudo - Remove a sudo user
+
+Note: Admin commands can only be used by sudo users.
+"""
+
+# Warning message (auto-deletes after 30 seconds)
+WARNING_MESSAGE = """
+⚠️ Security Alert: Unauthorized Message Edit Detected!
+User: {user_name}
+Action: Message edited and deleted
+Status: Security protocol activated
+"""
+
+# Database configuration
+DATABASE_URL = os.environ.get('DATABASE_URL', 'sqlite:///bot.db')
+
+# Bot configuration
 BOT_COMMANDS = [
     ("start", "Start the bot"),
     ("help", "Show help message"),
@@ -20,15 +72,16 @@ BOT_COMMANDS = [
 # Database configuration
 APPROVED_USERS = set()
 SUDO_USERS = set()
-SUDO_USERS.add(OWNER_ID)  # Owner is always a sudo user
+SUDO_USERS.add(ADMIN_ID)  # Admin is always a sudo user
 
 # Message configurations
 WELCOME_MESSAGE = """
-Hello! I am a moderation bot that helps protect against copyright infringement and manages media content.
+🛡️ Welcome to the Ultimate Security Shield! 🛡️
+I am your advanced security bot, protecting your group with military-grade security features.
 Only approved users can send media content.
 
-Bot Owner: {owner_name}
-Contact: {owner_username}
+Bot Name: {bot_name}
+Username: {bot_username}
 """
 
 HELP_MESSAGE = """
