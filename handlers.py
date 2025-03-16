@@ -26,16 +26,21 @@ db = Database()
 
 def get_user_from_message(update: Update, context: CallbackContext) -> tuple[Optional[int], Optional[str]]:
     """Extract user info from command arguments or replied message"""
-    if context.args:
-        logger.debug(f"Extracting user info from arguments: {context.args[0]}")
-        return extract_user_info(context.args[0])
-    elif update.message.reply_to_message:
-        reply_msg = update.message.reply_to_message
-        user = reply_msg.from_user
-        logger.debug(f"Extracting user info from replied message. User ID: {user.id}, Username: {user.username}")
-        return user.id, user.username
-    logger.debug("No user info found in command arguments or reply")
-    return None, None
+    try:
+        if context.args:
+            logger.debug(f"Extracting user info from arguments: {context.args[0]}")
+            return extract_user_info(context.args[0])
+        elif update.message.reply_to_message:
+            reply_msg = update.message.reply_to_message
+            user = reply_msg.from_user
+            if user:
+                logger.debug(f"Extracting user info from replied message. User ID: {user.id}, Username: {user.username}")
+                return user.id, user.username or str(user.id)
+        logger.debug("No user info found in command arguments or reply")
+        return None, None
+    except Exception as e:
+        logger.error(f"Error in get_user_from_message: {e}")
+        return None, None
 
 def send_temp_message(update: Update, context: CallbackContext, text: str):
     """Send a temporary message that will be deleted after 30 seconds"""
@@ -86,27 +91,32 @@ def help_command(update: Update, context: CallbackContext):
 def approve_command(update: Update, context: CallbackContext):
     """Handle the /approve command"""
     try:
-        if not update.message or not db.is_sudo_user(update.effective_user.id):
+        if not update.message:
+            return
+
+        user_id = update.effective_user.id
+        # Allow both admin and sudo users to approve
+        if user_id != ADMIN_ID and not db.is_sudo_user(user_id):
             send_temp_message(update, context, "❌ You don't have permission to approve users.")
             return
 
-        user_id, username = get_user_from_message(update, context)
+        target_user_id, username = get_user_from_message(update, context)
 
-        if not user_id and not username:
+        if not target_user_id and not username:
             send_temp_message(update, context, "❌ Please provide a user ID/username or reply to a user's message to approve them.")
             return
 
-        logger.debug(f"Attempting to approve user. ID: {user_id}, Username: {username}")
-        if user_id:
-            if db.add_approved_user(user_id, username or str(user_id), update.effective_user.id):
-                send_temp_message(update, context, f"✅ User {user_id} has been approved.")
-                logger.info(f"User {user_id} approved by {update.effective_user.id}")
+        logger.debug(f"Attempting to approve user. ID: {target_user_id}, Username: {username}")
+        if target_user_id:
+            if db.add_approved_user(target_user_id, username or str(target_user_id), user_id):
+                send_temp_message(update, context, f"✅ User {target_user_id} has been approved.")
+                logger.info(f"User {target_user_id} approved by {user_id}")
             else:
                 send_temp_message(update, context, "❌ Failed to approve user.")
         elif username:
-            if db.add_approved_user(0, username, update.effective_user.id):  # Using 0 as temporary ID
+            if db.add_approved_user(0, username, user_id):  # Using 0 as temporary ID
                 send_temp_message(update, context, f"✅ User {username} has been approved.")
-                logger.info(f"User {username} approved by {update.effective_user.id}")
+                logger.info(f"User {username} approved by {user_id}")
             else:
                 send_temp_message(update, context, "❌ Failed to approve user.")
     except Exception as e:
@@ -138,27 +148,32 @@ def disapprove_command(update: Update, context: CallbackContext):
 def addsudo_command(update: Update, context: CallbackContext):
     """Handle the /addsudo command"""
     try:
-        if not update.message or update.effective_user.id != ADMIN_ID:
-            send_temp_message(update, context, "❌ Only the bot admin can add sudo users.")
+        if not update.message:
             return
 
-        user_id, username = get_user_from_message(update, context)
+        user_id = update.effective_user.id
+        # Allow both admin and sudo users to add sudo users
+        if user_id != ADMIN_ID and not db.is_sudo_user(user_id):
+            send_temp_message(update, context, "❌ You don't have permission to add sudo users.")
+            return
 
-        if not user_id and not username:
+        target_user_id, username = get_user_from_message(update, context)
+
+        if not target_user_id and not username:
             send_temp_message(update, context, "❌ Please provide a user ID/username or reply to a user's message to add them as sudo.")
             return
 
-        logger.debug(f"Attempting to add sudo user. ID: {user_id}, Username: {username}")
-        if user_id:
-            if db.add_sudo_user(user_id, username or str(user_id), update.effective_user.id):
-                send_temp_message(update, context, f"✅ User {user_id} has been added as sudo.")
-                logger.info(f"User {user_id} added as sudo by admin")
+        logger.debug(f"Attempting to add sudo user. ID: {target_user_id}, Username: {username}")
+        if target_user_id:
+            if db.add_sudo_user(target_user_id, username or str(target_user_id), user_id):
+                send_temp_message(update, context, f"✅ User {target_user_id} has been added as sudo.")
+                logger.info(f"User {target_user_id} added as sudo by {user_id}")
             else:
                 send_temp_message(update, context, "❌ Failed to add sudo user.")
         elif username:
-            if db.add_sudo_user(0, username, update.effective_user.id):  # Using 0 as temporary ID
+            if db.add_sudo_user(0, username, user_id):  # Using 0 as temporary ID
                 send_temp_message(update, context, f"✅ User {username} has been added as sudo.")
-                logger.info(f"User {username} added as sudo by admin")
+                logger.info(f"User {username} added as sudo by {user_id}")
             else:
                 send_temp_message(update, context, "❌ Failed to add sudo user.")
     except Exception as e:
