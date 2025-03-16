@@ -30,23 +30,6 @@ I'm your ultimate security shield, protecting your group with advanced security 
 Use /help to see available commands.
 """
 
-HELP_MESSAGE = """
-Available commands:
-
-👥 User Commands:
-/start - Start the bot
-/help - Show this help message
-/status - Check bot status
-
-👑 Admin Commands:
-/approve - Approve a user
-/disapprove - Remove user approval
-/addsudo - Add a sudo user
-/removesudo - Remove a sudo user
-
-Note: Admin commands can only be used by sudo users.
-"""
-
 # Warning message (auto-deletes after 30 seconds)
 WARNING_MESSAGE = """
 ⚠️ Security Alert: Unauthorized Message Edit Detected!

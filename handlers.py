@@ -49,15 +49,22 @@ def start_command(update: Update, context: CallbackContext):
         context.bot.set_my_commands([
             BotCommand(command, description) for command, description in BOT_COMMANDS
         ])
-        # Send welcome message with owner info
-        send_temp_message(update, context, START_MESSAGE.format(bot_name=BOT_NAME))
+        # Send welcome message with owner info (permanent message)
+        context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text=START_MESSAGE.format(bot_name=BOT_NAME)
+        )
     except Exception as e:
         logger.error(f"Error in /start command: {e}")
 
 def help_command(update: Update, context: CallbackContext):
     """Handle the /help command"""
     try:
-        send_temp_message(update, context, HELP_MESSAGE)
+        # Send help message (permanent message)
+        context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text=HELP_MESSAGE
+        )
     except Exception as e:
         logger.error(f"Error in /help command: {e}")
 
