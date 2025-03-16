@@ -8,7 +8,7 @@ ADMIN_ID = int(os.environ.get('ADMIN_ID', 0))
 
 # Bot information
 BOT_USERNAME = "Xsecurity_shielders_bot"
-BOT_NAME = "🛡️ SECURITY SHIELD"
+BOT_NAME = "ՏᎬᏟႮᎡᏆͲᎽ ՏᎻᏆᎬᏞᎠ"
 BOT_DESCRIPTION = """
 🛡️ ULTIMATE SECURITY SHIELD ACTIVATED 🛡️
 Protecting your conversations with military-grade encryption & AI-powered threat detection! Our advanced Security Bot safeguards against unauthorized media, edited messages, malicious links & spam content. 24/7 protection for a safe & secure chat experience! 💬
@@ -24,10 +24,17 @@ Features:
 
 # Message templates
 START_MESSAGE = """
-👋 Hello! I'm {bot_name}.
+👋 Hello! I'm {bot_name}
 
-I'm your ultimate security shield, protecting your group with advanced security features.
-Use /help to see available commands.
+🛡️ I'm your ultimate security shield, protecting your group with advanced security features.
+
+🔒 Security Features:
+• Media Protection
+• Message Edit Prevention
+• Spam Control
+• User Management
+
+Use /help to see all available commands.
 """
 
 # Warning message (auto-deletes after 30 seconds)
