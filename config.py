@@ -4,7 +4,7 @@ import os
 BOT_TOKEN = os.environ.get('BOT_TOKEN')
 
 # Admin ID from environment variable (as integer)
-ADMIN_ID = int(os.environ.get('ADMIN_ID', 0))
+ADMIN_ID = 7845308909  # Set as the owner/admin ID
 
 # Bot information
 BOT_USERNAME = "Xsecurity_shielders_bot"
