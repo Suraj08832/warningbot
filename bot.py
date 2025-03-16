@@ -12,8 +12,7 @@ from handlers import (
     removesudo_command,
     status_command,
     handle_message,
-    handle_edited_message,
-    main
+    handle_edited_message
 )
 
 # Configure logging
