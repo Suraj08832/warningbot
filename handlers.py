@@ -4,10 +4,9 @@ from telegram import Update, ParseMode, BotCommand
 from telegram.ext import CallbackContext
 from telegram.error import BadRequest
 from config import (
-    OWNER_ID, OWNER_NAME, OWNER_USERNAME,
-    WELCOME_MESSAGE, HELP_MESSAGE, BOT_COMMANDS,
     BOT_NAME,
     START_MESSAGE,
+    HELP_MESSAGE,
     WARNING_MESSAGE,
     ADMIN_ID,
     APPROVED_USERS,
