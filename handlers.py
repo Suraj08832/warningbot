@@ -10,7 +10,8 @@ from config import (
     WARNING_MESSAGE,
     ADMIN_ID,
     APPROVED_USERS,
-    SUDO_USERS
+    SUDO_USERS,
+    BOT_COMMANDS
 )
 from database import Database
 from utils import (
@@ -46,16 +47,30 @@ def start_command(update: Update, context: CallbackContext):
     """Handle the /start command"""
     try:
         # Set bot commands for the user
-        context.bot.set_my_commands([
+        commands = [
             BotCommand(command, description) for command, description in BOT_COMMANDS
-        ])
+        ]
+        context.bot.set_my_commands(commands)
+        
         # Send welcome message with owner info (permanent message)
+        welcome_text = START_MESSAGE.format(bot_name=BOT_NAME)
         context.bot.send_message(
             chat_id=update.effective_chat.id,
-            text=START_MESSAGE.format(bot_name=BOT_NAME)
+            text=welcome_text,
+            parse_mode=ParseMode.HTML,
+            disable_web_page_preview=True
         )
+        
+        # Log successful start command
+        logger.info(f"Start command executed by user {update.effective_user.id}")
+        
     except Exception as e:
         logger.error(f"Error in /start command: {e}")
+        # Send error message to user
+        context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text="❌ An error occurred while processing your request. Please try again later."
+        )
 
 def help_command(update: Update, context: CallbackContext):
     """Handle the /help command"""
